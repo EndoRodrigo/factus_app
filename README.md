@@ -91,7 +91,7 @@ docs/
     └── 03_autenticacion.png
 ```
 
-![image alt](/assets/images/1.png)
+![image alt](https://github.com/EndoRodrigo/factus_app/blob/da7ccfde0fe4a8bff1b90f7c2d8857d27dfe1380/assets/images/1.png)
 
 ---
 
