@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/auth_notifier.dart';
+import '../providers/auth_providers.dart';
 
 class AuthTestPage extends ConsumerWidget {
   const AuthTestPage({super.key});
@@ -9,6 +10,7 @@ class AuthTestPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
+    final token = ref.read(tokenStorageProvider).getAccessToken();
 
     return Scaffold(
       appBar: AppBar(
@@ -49,6 +51,10 @@ class AuthTestPage extends ConsumerWidget {
                 Text(
                   'Expira en: ${authState.auth!.expiresIn} segundos',
                 ),
+                Text(
+                  'Token almacenado: ${token.toString()}',
+                ),
+
               ],
 
               if (authState.error != null) ...[
