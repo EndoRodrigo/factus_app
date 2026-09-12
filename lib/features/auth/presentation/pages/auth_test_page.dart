@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../invoices/presentation/pages/invoices_page.dart';
 import '../providers/auth_notifier.dart';
 import '../providers/auth_providers.dart';
 
@@ -53,6 +54,18 @@ class AuthTestPage extends ConsumerWidget {
                 ),
                 Text(
                   'Token almacenado: ${token.toString()}',
+                ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const InvoicesPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Ver mis facturas'),
                 ),
 
               ],
