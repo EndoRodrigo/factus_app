@@ -81,91 +81,9 @@ Dio
 Factus API
 ```
 
----
+## Captura UX
 
-# 🔐 Autenticación
-
-La aplicación utiliza el sistema de autenticación proporcionado por Factus API mediante OAuth 2.0.
-
-Actualmente se está trabajando con el ambiente **Sandbox** para realizar las pruebas de integración.
-
-Las credenciales no se almacenan directamente en el código fuente.
-
-Se utilizan variables mediante `--dart-define`.
-
----
-
-# 📸 Progreso del proyecto
-
-Esta sección se irá actualizando durante el desarrollo para documentar visualmente la evolución de la aplicación.
-
-## 1. Proyecto inicial
-
-Creación del proyecto Flutter y configuración inicial.
-
-### Estado
-
-* [x] Proyecto Flutter creado
-* [x] Estructura inicial
-* [x] Riverpod configurado
-* [x] Dio configurado
-* [x] Cliente HTTP inicial
-
-### Captura
-
-> 📷 Agregar captura de la primera ejecución de la aplicación.
-
-```text
-docs/
-└── screenshots/
-    └── 01_proyecto_inicial.png
-```
-
-![Proyecto inicial](docs/screenshots/01_proyecto_inicial.png)
-
----
-
-## 2. Configuración de Factus API
-
-Configuración de la conexión con el ambiente Sandbox de Factus.
-
-### Estado
-
-* [x] URL Sandbox configurada
-* [x] ApiClient creado
-* [x] Configuración mediante `dart-define`
-* [x] Endpoint de autenticación configurado
-
-### Captura
-
-> 📷 Agregar captura de la aplicación mostrando la pantalla de prueba.
-
-```text
-docs/
-└── screenshots/
-    └── 02_factus_configuracion.png
-```
-
-![Configuración Factus](docs/screenshots/02_factus_configuracion.png)
-
----
-
-## 3. Autenticación
-
-Implementación del proceso de autenticación contra Factus API.
-
-### Estado
-
-* [x] AuthRemoteDataSource
-* [x] AuthRepository
-* [x] AuthNotifier
-* [ ] Almacenamiento seguro del token
-* [ ] Refresh Token
-* [ ] Interceptor de autenticación
-
-### Captura
-
-> 📷 Agregar captura cuando la autenticación sea exitosa.
+> 📷 Agregar captura del avance de la app
 
 ```text
 docs/
@@ -173,7 +91,7 @@ docs/
     └── 03_autenticacion.png
 ```
 
-![Autenticación](docs/screenshots/03_autenticacion.png)
+![image alt](/assets/images/1.png)
 
 ---
 
@@ -231,30 +149,6 @@ Se contemplan:
 * Tests de providers/notifiers
 * Tests de widgets
 * Tests de integración
-
----
-
-# 📂 Documentación del progreso
-
-Las capturas del desarrollo se almacenan en:
-
-```text
-docs/
-└── screenshots/
-```
-
-Convención utilizada:
-
-```text
-01_proyecto_inicial.png
-02_factus_configuracion.png
-03_autenticacion.png
-04_token_seguro.png
-05_listado_facturas.png
-06_detalle_factura.png
-07_crear_factura.png
-...
-```
 
 Esto permite visualizar la evolución del proyecto de forma cronológica.
 
@@ -322,10 +216,3 @@ Actualmente el proyecto cuenta con:
 
 El siguiente objetivo es completar el flujo de autenticación y posteriormente comenzar con la gestión de facturas.
 
----
-
-# 👨‍💻 Desarrollo
-
-Proyecto desarrollado como reto técnico utilizando Flutter y Factus API.
-
-> El proyecto se encuentra en desarrollo y la arquitectura puede evolucionar conforme se incorporen nuevas funcionalidades.

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_constants.dart';
+import '../../../../core/constants/app_config.dart';
 import '../models/auth_model.dart';
 
 class AuthRemoteDataSource {
@@ -8,20 +9,15 @@ class AuthRemoteDataSource {
 
   AuthRemoteDataSource(this.dio);
 
-  Future<AuthModel> login({
-    required String username,
-    required String password,
-    required String clientId,
-    required String clientSecret,
-  }) async {
+  Future<AuthModel> login() async {
     final response = await dio.post(
       ApiConstants.authEndpoint,
       data: {
         'grant_type': 'password',
-        'username': username,
-        'password': password,
-        'client_id': clientId,
-        'client_secret': clientSecret,
+        'username': AppConfig.username,
+        'password': AppConfig.password,
+        'client_id': AppConfig.clientId,
+        'client_secret': AppConfig.clientSecret,
       },
       options: Options(
         contentType: Headers.formUrlEncodedContentType,

@@ -8,17 +8,7 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<AuthModel> login({
-    required String username,
-    required String password,
-    required String clientId,
-    required String clientSecret,
-  }) {
-    return remoteDataSource.login(
-      username: username,
-      password: password,
-      clientId: clientId,
-      clientSecret: clientSecret,
-    );
+  Future<AuthModel> login() {
+    return remoteDataSource.login();
   }
 }
