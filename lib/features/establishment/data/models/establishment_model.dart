@@ -8,7 +8,7 @@ class EstablishmentModel {
   final String email;
   final String phone;
   final String address;
-  final int municipalityId;
+  final String municipalityCode;
   final String municipalityName;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -20,7 +20,7 @@ class EstablishmentModel {
     required this.email,
     required this.phone,
     required this.address,
-    required this.municipalityId,
+    required this.municipalityCode,
     required this.municipalityName,
     required this.createdAt,
     required this.updatedAt,
@@ -34,10 +34,10 @@ class EstablishmentModel {
       email: data.email,
       phone: data.phone,
       address: data.address,
-      municipalityId: data.municipalityId,
-      municipalityName: data.municipalityName,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
+      municipalityCode: data.municipalityCode ?? '',
+      municipalityName: data.municipalityName ?? '',
+      createdAt: data.createdAt ?? DateTime.now(),
+      updatedAt: data.updatedAt ?? DateTime.now(),
     );
   }
 
@@ -49,7 +49,7 @@ class EstablishmentModel {
       email: email,
       phone: phone,
       address: address,
-      municipalityId: municipalityId,
+      municipalityCode: municipalityCode,
       municipalityName: municipalityName,
       createdAt: createdAt,
       updatedAt: updatedAt,

@@ -14,17 +14,16 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 });
 
 final establishmentLocalDataSourceProvider =
-Provider<EstablishmentLocalDataSource>((ref) {
-  final database = ref.watch(databaseProvider);
+    Provider<EstablishmentLocalDataSource>((ref) {
+      final database = ref.watch(databaseProvider);
 
-  return EstablishmentLocalDataSource(database);
-});
+      return EstablishmentLocalDataSource(database);
+    });
 
-final establishmentRepositoryProvider =
-Provider<EstablishmentRepository>((ref) {
-  final dataSource = ref.watch(
-    establishmentLocalDataSourceProvider,
-  );
+final establishmentRepositoryProvider = Provider<EstablishmentRepository>((
+  ref,
+) {
+  final dataSource = ref.watch(establishmentLocalDataSourceProvider);
 
   return EstablishmentRepositoryImpl(dataSource);
 });

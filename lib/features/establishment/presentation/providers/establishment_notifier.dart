@@ -31,67 +31,44 @@ class EstablishmentState {
   }
 }
 
-class EstablishmentNotifier
-    extends StateNotifier<EstablishmentState> {
+class EstablishmentNotifier extends StateNotifier<EstablishmentState> {
   final EstablishmentRepository repository;
 
-  EstablishmentNotifier(this.repository)
-      : super(const EstablishmentState());
+  EstablishmentNotifier(this.repository) : super(const EstablishmentState());
 
   Future<void> load() async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
       final establishment = await repository.getEstablishment();
 
-      state = state.copyWith(
-        isLoading: false,
-        establishment: establishment,
-      );
+      state = state.copyWith(isLoading: false, establishment: establishment);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   Future<void> create(Establishment establishment) async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
       await repository.createEstablishment(establishment);
 
       await load();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   Future<void> update(Establishment establishment) async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
       await repository.updateEstablishment(establishment);
 
       await load();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -102,36 +79,21 @@ class EstablishmentNotifier
       return;
     }
 
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await repository.deleteEstablishment(
-        establishment!.id!,
-      );
+      await repository.deleteEstablishment(establishment!.id!);
 
-      state = state.copyWith(
-        isLoading: false,
-        clearEstablishment: true,
-      );
+      state = state.copyWith(isLoading: false, clearEstablishment: true);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 }
 
 final establishmentNotifierProvider =
-StateNotifierProvider<
-    EstablishmentNotifier,
-    EstablishmentState>((ref) {
-  final repository = ref.watch(
-    establishmentRepositoryProvider,
-  );
+    StateNotifierProvider<EstablishmentNotifier, EstablishmentState>((ref) {
+      final repository = ref.watch(establishmentRepositoryProvider);
 
-  return EstablishmentNotifier(repository);
-});
+      return EstablishmentNotifier(repository);
+    });

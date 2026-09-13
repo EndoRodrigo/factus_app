@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../domain/entities/establishment.dart';
@@ -22,31 +23,25 @@ class EstablishmentRepositoryImpl implements EstablishmentRepository {
   }
 
   @override
-  Future<void> createEstablishment(
-    Establishment establishment,
-  ) async {
+  Future<void> createEstablishment(Establishment establishment) async {
     final companion = EstablishmentsCompanion.insert(
       name: establishment.name,
       nit: establishment.nit,
       email: establishment.email,
       phone: establishment.phone,
       address: establishment.address,
-      municipalityId: establishment.municipalityId,
-      municipalityName: establishment.municipalityName,
+      municipalityCode: Value(establishment.municipalityCode),
+      municipalityName: Value(establishment.municipalityName),
     );
 
     await localDataSource.createEstablishment(companion);
   }
 
   @override
-  Future<void> updateEstablishment(
-    Establishment establishment,
-  ) async {
+  Future<void> updateEstablishment(Establishment establishment) async {
     final id = establishment.id;
     if (id == null) {
-      throw ArgumentError(
-        'No se puede actualizar un establecimiento sin id',
-      );
+      throw ArgumentError('No se puede actualizar un establecimiento sin id');
     }
 
     final data = EstablishmentTableData(
@@ -56,7 +51,7 @@ class EstablishmentRepositoryImpl implements EstablishmentRepository {
       email: establishment.email,
       phone: establishment.phone,
       address: establishment.address,
-      municipalityId: establishment.municipalityId,
+      municipalityCode: establishment.municipalityCode,
       municipalityName: establishment.municipalityName,
       createdAt: establishment.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),

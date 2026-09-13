@@ -14,13 +14,13 @@ class Establishments extends Table {
 
   TextColumn get address => text()();
 
-  IntColumn get municipalityId => integer()();
+  TextColumn get municipalityCode => text().nullable()();
 
-  TextColumn get municipalityName => text()();
+  TextColumn get municipalityName => text().nullable()();
 
   DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
+      dateTime().withDefault(currentDateAndTime).nullable()();
 
   DateTimeColumn get updatedAt =>
-      dateTime().withDefault(currentDateAndTime)();
+      dateTime().withDefault(currentDateAndTime).nullable()();
 }

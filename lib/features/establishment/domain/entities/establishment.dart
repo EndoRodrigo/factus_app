@@ -5,7 +5,7 @@ class Establishment {
   final String email;
   final String phone;
   final String address;
-  final int municipalityId;
+  final String municipalityCode;
   final String municipalityName;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -17,7 +17,7 @@ class Establishment {
     required this.email,
     required this.phone,
     required this.address,
-    required this.municipalityId,
+    required this.municipalityCode,
     required this.municipalityName,
     this.createdAt,
     this.updatedAt,
