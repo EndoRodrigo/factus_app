@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../establishment/presentation/pages/profile_page.dart';
 import '../../../invoices/presentation/pages/invoices_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,11 +35,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          _titles[_currentIndex],
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+        title: Text(_titles[_currentIndex]),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            tooltip: 'Mi perfil',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
 
       body: _pages[_currentIndex],
