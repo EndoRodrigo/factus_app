@@ -37,23 +37,8 @@ class _InvoicesPageState extends ConsumerState<InvoicesPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(invoiceNotifierProvider);
+    return _buildBody(state);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Mis Facturas'),
-            if (state.invoices.isNotEmpty)
-              Text(
-                'Total: ${state.total} registros',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-          ],
-        ),
-      ),
-      body: _buildBody(state),
-    );
   }
 
   Widget _buildBody(InvoiceState state) {

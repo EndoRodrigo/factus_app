@@ -8,12 +8,8 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   InvoiceRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<InvoicePagination> getInvoices({
-    int page = 1,
-  }) async {
-    final result = await remoteDataSource.getInvoices(
-      page: page,
-    );
+  Future<InvoicePagination> getInvoices({int page = 1}) async {
+    final result = await remoteDataSource.getInvoices(page: page);
 
     return result.toEntity();
   }

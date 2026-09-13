@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../invoices/presentation/pages/invoices_page.dart';
+
+import '../../../home/presentation/page/home_page.dart';
 import '../providers/auth_notifier.dart';
 import '../providers/auth_providers.dart';
 
@@ -11,11 +12,29 @@ class AuthTestPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
-    final token = ref.read(tokenStorageProvider).getAccessToken();
+
+    ref.listen<AuthState>(
+      authNotifierProvider,
+          (previous, next) {
+          // Autenticación exitosa
+        if (previous?.auth == null && next.auth != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            ),
+          );
+        }
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Prueba Factus'),
+        title: const Text(
+          'Factus',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
       body: Center(
         child: Padding(
@@ -23,6 +42,15 @@ class AuthTestPage extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                'assets/images/capi-factus.png',
+                width: 300,
+                height: 300,
+                alignment: Alignment.topCenter,
+              ),
+
+              const SizedBox(height: 24),
+
               if (authState.isLoading)
                 const CircularProgressIndicator()
               else
@@ -32,43 +60,13 @@ class AuthTestPage extends ConsumerWidget {
                         .read(authNotifierProvider.notifier)
                         .login();
                   },
-                  child: const Text('Iniciar sesión'),
-                ),
-
-              const SizedBox(height: 24),
-
-              if (authState.auth != null) ...[
-                const Text(
-                  'Autenticación exitosa',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  child: const Text(
+                    'Iniciar sesión',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Tipo: ${authState.auth!.tokenType}',
-                ),
-                Text(
-                  'Expira en: ${authState.auth!.expiresIn} segundos',
-                ),
-                Text(
-                  'Token almacenado: ${token.toString()}',
-                ),
-
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const InvoicesPage(),
-                      ),
-                    );
-                  },
-                  child: const Text('Ver mis facturas'),
-                ),
-
-              ],
 
               if (authState.error != null) ...[
                 const SizedBox(height: 20),
