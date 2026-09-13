@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/database/app_database.dart';
+import '../../domain/entities/establishment.dart';
 import '../providers/establishment_notifier.dart';
 
 class EstablishmentFormPage extends ConsumerStatefulWidget {
@@ -171,18 +171,16 @@ class _EstablishmentFormPageState extends ConsumerState<EstablishmentFormPage> {
       return;
     }
 
-    final currentEstablishment = ref
-        .read(establishmentNotifierProvider)
-        .establishment;
+    final currentEstablishment = ref.read(establishmentNotifierProvider).establishment;
 
     final establishment = Establishment(
-      id: currentEstablishment!.id,
+      id: currentEstablishment?.id,
       name: _nameController.text.trim(),
       nit: _nitController.text.trim(),
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
       address: _addressController.text.trim(),
-      municipalityId: int.parse(_municipalityIdController.text.trim()),
+      municipalityId: int.tryParse(_municipalityIdController.text.trim()) ?? 0,
       municipalityName: _municipalityNameController.text.trim(),
       createdAt: currentEstablishment?.createdAt,
       updatedAt: currentEstablishment?.updatedAt,

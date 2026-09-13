@@ -1,4 +1,4 @@
-import '../../../../core/database/app_database.dart';
+import '../entities/establishment.dart';
 
 abstract class EstablishmentRepository {
   Future<Establishment?> getEstablishment();

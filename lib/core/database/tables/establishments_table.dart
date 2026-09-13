@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+@DataClassName('EstablishmentTableData')
 class Establishments extends Table {
   IntColumn get id => integer().autoIncrement()();
 

@@ -5,11 +5,11 @@ class EstablishmentLocalDataSource {
 
   EstablishmentLocalDataSource(this.database);
 
-  Future<List<Establishment>> getEstablishments() {
+  Future<List<EstablishmentTableData>> getEstablishments() {
     return database.select(database.establishments).get();
   }
 
-  Future<Establishment?> getEstablishment() async {
+  Future<EstablishmentTableData?> getEstablishment() async {
     final establishments = await database.select(
       database.establishments,
     ).get();
@@ -28,7 +28,7 @@ class EstablishmentLocalDataSource {
   }
 
   Future<bool> updateEstablishment(
-      Establishment establishment,
+      EstablishmentTableData establishment,
       ) {
     return database.update(database.establishments).replace(establishment);
   }

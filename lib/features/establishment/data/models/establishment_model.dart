@@ -1,7 +1,8 @@
 import '../../../../core/database/app_database.dart';
+import '../../domain/entities/establishment.dart';
 
 class EstablishmentModel {
-  final int? id;
+  final int id;
   final String name;
   final String nit;
   final String email;
@@ -9,11 +10,11 @@ class EstablishmentModel {
   final String address;
   final int municipalityId;
   final String municipalityName;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   const EstablishmentModel({
-    this.id,
+    required this.id,
     required this.name,
     required this.nit,
     required this.email,
@@ -21,11 +22,11 @@ class EstablishmentModel {
     required this.address,
     required this.municipalityId,
     required this.municipalityName,
-    this.createdAt,
-    this.updatedAt,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  factory EstablishmentModel.fromDrift(Establishment data) {
+  factory EstablishmentModel.fromDrift(EstablishmentTableData data) {
     return EstablishmentModel(
       id: data.id,
       name: data.name,

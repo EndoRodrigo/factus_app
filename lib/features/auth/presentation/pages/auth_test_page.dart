@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../home/presentation/page/home_page.dart';
 import '../providers/auth_notifier.dart';
-import '../providers/auth_providers.dart';
 
 class AuthTestPage extends ConsumerWidget {
   const AuthTestPage({super.key});
