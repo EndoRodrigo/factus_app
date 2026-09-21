@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../customer/presentation/pages/customer_test_page.dart';
 import '../../../establishment/presentation/pages/profile_page.dart';
 import '../../../invoices/presentation/pages/invoices_page.dart';
 
@@ -43,9 +44,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
             },
           ),
@@ -247,10 +246,23 @@ class _CreateInvoicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Crear factura',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Center(
+      child: Column(
+        children: [
+          Text(
+            'Crear factura',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CustomerTestPage()),
+              );
+            },
+            child: const Text('Probar cliente'),
+          ),
+        ],
       ),
     );
   }
