@@ -1,3 +1,4 @@
+import 'package:factus_app/features/products/presentation/pages/products_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../customer/presentation/pages/customer_test_page.dart';
@@ -49,6 +50,86 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
+      ),
+
+      drawer: Drawer(
+        child: SafeArea(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              const DrawerHeader(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.receipt_long, size: 45),
+                    SizedBox(height: 12),
+                    Text(
+                      'Factus',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text('Gestión de facturación'),
+                  ],
+                ),
+              ),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'CONSULTAS',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              ListTile(
+                leading: const Icon(Icons.receipt_long_outlined),
+                title: const Text('Consultar facturas'),
+                onTap: () {
+                  Navigator.pop(context);
+
+                  setState(() {
+                    _currentIndex = 1;
+                  });
+                },
+              ),
+
+              ListTile(
+                leading: const Icon(Icons.people_outline),
+                title: const Text('Consultar clientes'),
+                onTap: () {
+                  Navigator.pop(context);
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CustomerTestPage()),
+                  );
+                },
+              ),
+
+              const Divider(),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'CATÁLOGOS',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              ListTile(
+                leading: const Icon(Icons.inventory_2_outlined),
+                title: const Text('Productos'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductsPage()));
+                },
+              ),
+            ],
+          ),
+        ),
       ),
 
       body: _pages[_currentIndex],
