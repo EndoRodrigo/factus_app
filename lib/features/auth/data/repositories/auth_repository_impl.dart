@@ -1,26 +1,24 @@
 import '../../../../core/network/token_storage.dart';
+import '../../domain/entities/auth.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
-import '../models/auth_model.dart';
+import '../mappers/auth_mapper.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final TokenStorage tokenStorage;
 
-  AuthRepositoryImpl(
-      this.remoteDataSource,
-      this.tokenStorage,
-      );
+  AuthRepositoryImpl(this.remoteDataSource, this.tokenStorage);
 
   @override
-  Future<AuthModel> login() async {
-    final auth = await remoteDataSource.login();
+  Future<Auth> login() async {
+    final model = await remoteDataSource.login();
 
     await tokenStorage.saveTokens(
-      accessToken: auth.accessToken,
-      refreshToken: auth.refreshToken,
+      accessToken: model.accessToken,
+      refreshToken: model.refreshToken,
     );
 
-    return auth;
+    return AuthMapper.toEntity(model);
   }
 }

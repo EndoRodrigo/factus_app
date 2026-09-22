@@ -1,6 +1,7 @@
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_local_data_source.dart';
+import '../mappers/product_mapper.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductLocalDataSource localDataSource;
@@ -10,47 +11,14 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<List<Product>> getProducts() async {
     final products = await localDataSource.getProducts();
-
-    return products
-        .map(
-          (product) => Product(
-            id: product.id,
-            name: product.name,
-            code: product.code,
-            price: product.price,
-            taxRate: product.taxRate,
-            description: product.description,
-            unitMeasureCode: product.unitMeasureCode,
-            standardCode: product.standardCode,
-            isActive: product.isActive,
-            createdAt: product.createdAt,
-            updatedAt: product.updatedAt,
-          ),
-        )
-        .toList();
+    return products.map(ProductMapper.toEntity).toList();
   }
 
   @override
   Future<Product?> getProductById(int id) async {
     final product = await localDataSource.getProductById(id);
-
-    if (product == null) {
-      return null;
-    }
-
-    return Product(
-      id: product.id,
-      name: product.name,
-      code: product.code,
-      price: product.price,
-      taxRate: product.taxRate,
-      description: product.description,
-      unitMeasureCode: product.unitMeasureCode,
-      standardCode: product.standardCode,
-      isActive: product.isActive,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt,
-    );
+    if (product == null) return null;
+    return ProductMapper.toEntity(product);
   }
 
   @override

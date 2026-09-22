@@ -1,5 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/establishment.dart';
 import '../../domain/repositories/establishment_repository.dart';
 import 'establishment_provider.dart';
@@ -23,25 +22,26 @@ class EstablishmentState {
   }) {
     return EstablishmentState(
       isLoading: isLoading ?? this.isLoading,
-      establishment: clearEstablishment
-          ? null
-          : establishment ?? this.establishment,
+      establishment: clearEstablishment ? null : establishment ?? this.establishment,
       error: error,
     );
   }
 }
 
-class EstablishmentNotifier extends StateNotifier<EstablishmentState> {
-  final EstablishmentRepository repository;
+class EstablishmentNotifier extends Notifier<EstablishmentState> {
+  late final EstablishmentRepository _repository;
 
-  EstablishmentNotifier(this.repository) : super(const EstablishmentState());
+  @override
+  EstablishmentState build() {
+    _repository = ref.watch(establishmentRepositoryProvider);
+    return const EstablishmentState();
+  }
 
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final establishment = await repository.getEstablishment();
-
+      final establishment = await _repository.getEstablishment();
       state = state.copyWith(isLoading: false, establishment: establishment);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -52,8 +52,7 @@ class EstablishmentNotifier extends StateNotifier<EstablishmentState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await repository.createEstablishment(establishment);
-
+      await _repository.createEstablishment(establishment);
       await load();
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -64,8 +63,7 @@ class EstablishmentNotifier extends StateNotifier<EstablishmentState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await repository.updateEstablishment(establishment);
-
+      await _repository.updateEstablishment(establishment);
       await load();
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -74,16 +72,12 @@ class EstablishmentNotifier extends StateNotifier<EstablishmentState> {
 
   Future<void> delete() async {
     final establishment = state.establishment;
-
-    if (establishment?.id == null) {
-      return;
-    }
+    if (establishment?.id == null) return;
 
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await repository.deleteEstablishment(establishment!.id!);
-
+      await _repository.deleteEstablishment(establishment!.id!);
       state = state.copyWith(isLoading: false, clearEstablishment: true);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -91,9 +85,6 @@ class EstablishmentNotifier extends StateNotifier<EstablishmentState> {
   }
 }
 
-final establishmentNotifierProvider =
-    StateNotifierProvider<EstablishmentNotifier, EstablishmentState>((ref) {
-      final repository = ref.watch(establishmentRepositoryProvider);
-
-      return EstablishmentNotifier(repository);
-    });
+final establishmentNotifierProvider = NotifierProvider<EstablishmentNotifier, EstablishmentState>(() {
+  return EstablishmentNotifier();
+});

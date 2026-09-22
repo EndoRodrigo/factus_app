@@ -1,5 +1,3 @@
-import '../../domain/entities/customer.dart';
-
 class CustomerModel {
   final int? id;
   final String identification;
@@ -23,17 +21,17 @@ class CustomerModel {
     required this.municipalityName,
   });
 
-  Customer toEntity() {
-    return Customer(
-      id: id,
-      identification: identification,
-      identificationType: identificationType,
-      name: name,
-      email: email,
-      phone: phone,
-      address: address,
-      municipalityCode: municipalityCode,
-      municipalityName: municipalityName,
+  factory CustomerModel.fromJson(Map<String, dynamic> json) {
+    return CustomerModel(
+      id: json['id'] as int?,
+      identification: json['identification']?.toString() ?? '',
+      identificationType: json['identification_document_id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      municipalityCode: json['municipality_code']?.toString() ?? '',
+      municipalityName: json['municipality']?.toString() ?? '',
     );
   }
 }

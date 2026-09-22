@@ -1,5 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/customer.dart';
 import '../../domain/repositories/customer_repository.dart';
 import 'customer_provider.dart';
@@ -20,10 +19,14 @@ class CustomerState {
   }
 }
 
-class CustomerNotifier extends StateNotifier<CustomerState> {
-  final CustomerRepository repository;
+class CustomerNotifier extends Notifier<CustomerState> {
+  late final CustomerRepository _repository;
 
-  CustomerNotifier(this.repository) : super(const CustomerState());
+  @override
+  CustomerState build() {
+    _repository = ref.watch(customerRepositoryProvider);
+    return const CustomerState();
+  }
 
   Future<void> searchCustomer({
     required String identificationDocumentCode,
@@ -32,7 +35,7 @@ class CustomerNotifier extends StateNotifier<CustomerState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final customer = await repository.getCustomer(
+      final customer = await _repository.getCustomer(
         identificationDocumentCode: identificationDocumentCode,
         identificationNumber: identificationNumber,
       );
@@ -43,14 +46,9 @@ class CustomerNotifier extends StateNotifier<CustomerState> {
     }
   }
 
-  void clearCustomer() {
-    state = const CustomerState();
-  }
+  void clearCustomer() => state = const CustomerState();
 }
 
-final customerNotifierProvider =
-    StateNotifierProvider<CustomerNotifier, CustomerState>((ref) {
-  final repository = ref.watch(customerRepositoryProvider);
-
-  return CustomerNotifier(repository);
+final customerNotifierProvider = NotifierProvider<CustomerNotifier, CustomerState>(() {
+  return CustomerNotifier();
 });

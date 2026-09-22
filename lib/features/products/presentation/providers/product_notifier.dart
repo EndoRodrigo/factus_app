@@ -1,5 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import 'product_providers.dart';
@@ -27,56 +26,39 @@ class ProductState {
     return ProductState(
       isLoading: isLoading ?? this.isLoading,
       products: products ?? this.products,
-      selectedProduct: clearSelectedProduct
-          ? null
-          : selectedProduct ?? this.selectedProduct,
+      selectedProduct: clearSelectedProduct ? null : selectedProduct ?? this.selectedProduct,
       error: error,
     );
   }
 }
 
-class ProductNotifier extends StateNotifier<ProductState> {
-  final ProductRepository repository;
+class ProductNotifier extends Notifier<ProductState> {
+  late final ProductRepository _repository;
 
-  ProductNotifier(this.repository) : super(const ProductState());
+  @override
+  ProductState build() {
+    _repository = ref.watch(productRepositoryProvider);
+    return const ProductState();
+  }
 
   Future<void> loadProducts() async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final products = await repository.getProducts();
-
-      state = state.copyWith(
-        isLoading: false,
-        products: products,
-        error: null,
-      );
+      final products = await _repository.getProducts();
+      state = state.copyWith(isLoading: false, products: products);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   Future<Product?> getProductById(int id) async {
     try {
-      final product = await repository.getProductById(id);
-
-      state = state.copyWith(
-        selectedProduct: product,
-        error: null,
-      );
-
+      final product = await _repository.getProductById(id);
+      state = state.copyWith(selectedProduct: product);
       return product;
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-      );
-
+      state = state.copyWith(error: e.toString());
       return null;
     }
   }
@@ -90,13 +72,10 @@ class ProductNotifier extends StateNotifier<ProductState> {
     required String unitMeasureCode,
     required String standardCode,
   }) async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await repository.createProduct(
+      await _repository.createProduct(
         name: name,
         code: code,
         price: price,
@@ -105,16 +84,10 @@ class ProductNotifier extends StateNotifier<ProductState> {
         unitMeasureCode: unitMeasureCode,
         standardCode: standardCode,
       );
-
       await loadProducts();
-
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-
+      state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
   }
@@ -130,13 +103,10 @@ class ProductNotifier extends StateNotifier<ProductState> {
     required String standardCode,
     required bool isActive,
   }) async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final updated = await repository.updateProduct(
+      final updated = await _repository.updateProduct(
         id: id,
         name: name,
         code: code,
@@ -147,73 +117,31 @@ class ProductNotifier extends StateNotifier<ProductState> {
         standardCode: standardCode,
         isActive: isActive,
       );
-
-      if (updated) {
-        await loadProducts();
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'No se pudo actualizar el producto.',
-        );
-      }
-
+      if (updated) await loadProducts();
       return updated;
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-
+      state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
   }
 
   Future<bool> deleteProduct(int id) async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final deleted = await repository.deleteProduct(id);
-
-      if (deleted) {
-        await loadProducts();
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'No se pudo desactivar el producto.',
-        );
-      }
-
+      final deleted = await _repository.deleteProduct(id);
+      if (deleted) await loadProducts();
       return deleted;
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-
+      state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
   }
 
-  void clearSelectedProduct() {
-    state = state.copyWith(
-      clearSelectedProduct: true,
-      error: null,
-    );
-  }
-
-  void clearError() {
-    state = state.copyWith(
-      error: null,
-    );
-  }
+  void clearSelectedProduct() => state = state.copyWith(clearSelectedProduct: true);
+  void clearError() => state = state.copyWith(error: null);
 }
 
-final productNotifierProvider =
-    StateNotifierProvider<ProductNotifier, ProductState>((ref) {
-  final repository = ref.watch(productRepositoryProvider);
-
-  return ProductNotifier(repository);
+final productNotifierProvider = NotifierProvider<ProductNotifier, ProductState>(() {
+  return ProductNotifier();
 });

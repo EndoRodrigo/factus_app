@@ -147,7 +147,7 @@ class _SectionHeader extends StatelessWidget {
               .titleMedium
               ?.copyWith(fontWeight: FontWeight.bold),
         ),
-        if (trailing != null) trailing!,
+        ?trailing,
       ],
     );
   }

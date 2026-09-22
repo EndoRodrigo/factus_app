@@ -1,6 +1,7 @@
 import '../../domain/entities/customer.dart';
 import '../../domain/repositories/customer_repository.dart';
 import '../datasources/customer_remote_data_source.dart';
+import '../mappers/customer_mapper.dart';
 
 class CustomerRepositoryImpl implements CustomerRepository {
   final CustomerRemoteDataSource remoteDataSource;
@@ -12,11 +13,11 @@ class CustomerRepositoryImpl implements CustomerRepository {
     required String identificationDocumentCode,
     required String identificationNumber,
   }) async {
-    final customer = await remoteDataSource.getCustomer(
+    final model = await remoteDataSource.getCustomer(
       identificationDocumentCode: identificationDocumentCode,
       identificationNumber: identificationNumber,
     );
 
-    return customer.toEntity();
+    return CustomerMapper.toEntity(model);
   }
 }

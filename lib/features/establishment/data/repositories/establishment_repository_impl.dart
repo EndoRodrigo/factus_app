@@ -1,10 +1,9 @@
 import 'package:drift/drift.dart';
-
 import '../../../../core/database/app_database.dart';
 import '../../domain/entities/establishment.dart';
 import '../../domain/repositories/establishment_repository.dart';
 import '../datasources/establishment_local_data_source.dart';
-import '../models/establishment_model.dart';
+import '../mappers/establishment_mapper.dart';
 
 class EstablishmentRepositoryImpl implements EstablishmentRepository {
   final EstablishmentLocalDataSource localDataSource;
@@ -14,12 +13,8 @@ class EstablishmentRepositoryImpl implements EstablishmentRepository {
   @override
   Future<Establishment?> getEstablishment() async {
     final result = await localDataSource.getEstablishment();
-
-    if (result == null) {
-      return null;
-    }
-
-    return EstablishmentModel.fromDrift(result).toEntity();
+    if (result == null) return null;
+    return EstablishmentMapper.toEntity(result);
   }
 
   @override
@@ -53,7 +48,7 @@ class EstablishmentRepositoryImpl implements EstablishmentRepository {
       address: establishment.address,
       municipalityCode: establishment.municipalityCode,
       municipalityName: establishment.municipalityName,
-      createdAt: establishment.createdAt ?? DateTime.now(),
+      createdAt: establishment.createdAt,
       updatedAt: DateTime.now(),
     );
 

@@ -1,18 +1,17 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/exceptions/app_exception.dart';
-
-import '../../data/models/auth_model.dart';
+import '../../domain/entities/auth.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_providers.dart';
 
 class AuthState {
   final bool isLoading;
-  final AuthModel? auth;
+  final Auth? auth;
   final String? error;
 
   const AuthState({this.isLoading = false, this.auth, this.error});
 
-  AuthState copyWith({bool? isLoading, AuthModel? auth, String? error}) {
+  AuthState copyWith({bool? isLoading, Auth? auth, String? error}) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       auth: auth ?? this.auth,
@@ -21,31 +20,34 @@ class AuthState {
   }
 }
 
-class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthRepository repository;
+class AuthNotifier extends Notifier<AuthState> {
+  late final AuthRepository _repository;
 
-  AuthNotifier(this.repository) : super(const AuthState());
+  @override
+  AuthState build() {
+    _repository = ref.watch(authRepositoryProvider);
+    return const AuthState();
+  }
 
   Future<void> login() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final auth = await repository.login();
-
+      final auth = await _repository.login();
       state = state.copyWith(isLoading: false, auth: auth);
     } catch (e) {
       state = state.copyWith(
-        isLoading: false, 
+        isLoading: false,
         error: e is AppException ? e.message : e.toString(),
       );
     }
   }
+
+  void logout() {
+    state = const AuthState();
+  }
 }
 
-final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
-  ref,
-) {
-  final repository = ref.watch(authRepositoryProvider);
-
-  return AuthNotifier(repository);
+final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(() {
+  return AuthNotifier();
 });

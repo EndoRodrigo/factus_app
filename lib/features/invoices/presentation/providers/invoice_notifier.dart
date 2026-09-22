@@ -1,6 +1,5 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/exceptions/app_exception.dart';
-
 import '../../data/models/create_invoice_request.dart';
 import '../../domain/entities/invoice.dart';
 import '../../domain/repositories/invoice_repository.dart';
@@ -49,17 +48,20 @@ class InvoiceState {
   }
 }
 
-class InvoiceNotifier extends StateNotifier<InvoiceState> {
-  final InvoiceRepository repository;
+class InvoiceNotifier extends Notifier<InvoiceState> {
+  late final InvoiceRepository _repository;
 
-  InvoiceNotifier(this.repository) : super(const InvoiceState());
+  @override
+  InvoiceState build() {
+    _repository = ref.watch(invoiceRepositoryProvider);
+    return const InvoiceState();
+  }
 
   Future<void> loadInvoices() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final result = await repository.getInvoices(page: 1);
-
+      final result = await _repository.getInvoices(page: 1);
       state = state.copyWith(
         isLoading: false,
         invoices: result.invoices,
@@ -69,23 +71,19 @@ class InvoiceNotifier extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       state = state.copyWith(
-        isLoading: false, 
+        isLoading: false,
         error: e is AppException ? e.message : e.toString(),
       );
     }
   }
 
   Future<void> loadNextPage() async {
-    if (state.isLoading) return;
-
-    if (!state.hasNextPage) return;
+    if (state.isLoading || !state.hasNextPage) return;
 
     try {
       state = state.copyWith(isLoading: true, error: null);
-
       final nextPage = state.currentPage + 1;
-
-      final result = await repository.getInvoices(page: nextPage);
+      final result = await _repository.getInvoices(page: nextPage);
 
       state = state.copyWith(
         isLoading: false,
@@ -96,44 +94,32 @@ class InvoiceNotifier extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       state = state.copyWith(
-        isLoading: false, 
+        isLoading: false,
         error: e is AppException ? e.message : e.toString(),
       );
     }
   }
 
-
   Future<bool> validateInvoice(CreateInvoiceRequest request) async {
     state = state.copyWith(isLoading: true, error: null, clearLastResponse: true);
 
     try {
-      final response = await repository.validateInvoice(request);
-
-      state = state.copyWith(
-        isLoading: false,
-        lastResponse: response,
-      );
-      
+      final response = await _repository.validateInvoice(request);
+      state = state.copyWith(isLoading: false, lastResponse: response);
       await loadInvoices();
-      
       return true;
     } catch (e) {
       state = state.copyWith(
-        isLoading: false, 
+        isLoading: false,
         error: e is AppException ? e.message : e.toString(),
       );
       return false;
     }
   }
 
-  void clearError() {
-    state = state.copyWith(error: null);
-  }
+  void clearError() => state = state.copyWith(error: null);
 }
 
-final invoiceNotifierProvider =
-    StateNotifierProvider<InvoiceNotifier, InvoiceState>((ref) {
-      final repository = ref.watch(invoiceRepositoryProvider);
-
-      return InvoiceNotifier(repository);
-    });
+final invoiceNotifierProvider = NotifierProvider<InvoiceNotifier, InvoiceState>(() {
+  return InvoiceNotifier();
+});
