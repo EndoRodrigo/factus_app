@@ -17,11 +17,6 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> createInvoice(CreateInvoiceRequest request) {
-    return remoteDataSource.createInvoice(request);
-  }
-
-  @override
   Future<Map<String, dynamic>> validateInvoice(CreateInvoiceRequest request) {
     return remoteDataSource.validateInvoice(request);
   }

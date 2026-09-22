@@ -22,8 +22,8 @@ class CreateInvoiceRequest {
 }
 
 class CustomerRequest {
-  final int identification;
-  final String identificationType;
+  final String identification;
+  final int identificationDocumentId;
   final String names;
   final String email;
   final String phone;
@@ -32,7 +32,7 @@ class CustomerRequest {
 
   const CustomerRequest({
     required this.identification,
-    required this.identificationType,
+    required this.identificationDocumentId,
     required this.names,
     required this.email,
     required this.phone,
@@ -43,7 +43,7 @@ class CustomerRequest {
   Map<String, dynamic> toJson() {
     return {
       'identification': identification,
-      'identification_type': identificationType,
+      'identification_document_id': identificationDocumentId,
       'names': names,
       'email': email,
       'phone': phone,
@@ -58,8 +58,12 @@ class InvoiceItemRequest {
   final String name;
   final double quantity;
   final double price;
-  final String unitMeasureCode;
-  final String standardCode;
+  final double taxRate;
+  final double discountRate;
+  final int unitMeasureId;
+  final int standardCodeId;
+  final int isExcluded;
+  final int tributeId;
   final List<InvoiceTaxRequest> taxes;
 
   const InvoiceItemRequest({
@@ -67,8 +71,12 @@ class InvoiceItemRequest {
     required this.name,
     required this.quantity,
     required this.price,
-    required this.unitMeasureCode,
-    required this.standardCode,
+    required this.taxRate,
+    required this.discountRate,
+    required this.unitMeasureId,
+    required this.standardCodeId,
+    required this.isExcluded,
+    required this.tributeId,
     required this.taxes,
   });
 
@@ -78,9 +86,13 @@ class InvoiceItemRequest {
       'name': name,
       'quantity': quantity,
       'price': price,
-      'unit_measure_code': unitMeasureCode,
-      'standard_code': standardCode,
-      'taxes': taxes.map((tax) => tax.toJson()).toList(),
+      'tax_rate': taxRate,
+      'discount_rate': discountRate,
+      'unit_measure_id': unitMeasureId,
+      'standard_code_id': standardCodeId,
+      'is_excluded': isExcluded,
+      'tribute_id': tributeId,
+      // 'taxes': taxes.map((tax) => tax.toJson()).toList(), // V1 might not use this list if tax_rate is direct
     };
   }
 }

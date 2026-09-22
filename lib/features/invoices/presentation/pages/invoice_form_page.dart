@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/presentation/utils/ui_utils.dart';
 import '../../../customer/domain/entities/customer.dart';
 import '../../../customer/presentation/providers/customer_notifier.dart';
 import '../../../products/presentation/providers/product_notifier.dart';
@@ -35,16 +36,15 @@ class _InvoiceFormPageState extends ConsumerState<InvoiceFormPage> {
                     trailing: TextButton.icon(
                       onPressed: _showCustomerSelector,
                       icon: const Icon(Icons.search),
-                      label: Text(draft.customer == null ? 'Seleccionar' : 'Cambiar'),
+                      label: Text(
+                          draft.customer == null ? 'Seleccionar' : 'Cambiar'),
                     ),
                   ),
                   if (draft.customer != null)
                     _CustomerCard(customer: draft.customer!)
                   else
                     const _EmptyCard(text: 'No se ha seleccionado un cliente'),
-
                   const SizedBox(height: 24),
-
                   _SectionHeader(
                     title: 'Productos',
                     trailing: IconButton(
@@ -56,21 +56,23 @@ class _InvoiceFormPageState extends ConsumerState<InvoiceFormPage> {
                     const _EmptyCard(text: 'Agrega productos a la factura')
                   else
                     ...draft.items.map((item) => _ProductItemRow(item: item)),
-
                   const SizedBox(height: 24),
-                  
                   const _SectionHeader(title: 'Resumen'),
                   _SummaryCard(draft: draft),
-                  
                   const SizedBox(height: 32),
-                  
                   FilledButton.icon(
-                    onPressed: (draft.customer == null || draft.items.isEmpty || invoiceState.isLoading)
+                    onPressed: (draft.customer == null ||
+                            draft.items.isEmpty ||
+                            invoiceState.isLoading)
                         ? null
                         : _createInvoice,
-                    icon: invoiceState.isLoading 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(Icons.send),
+                    icon: invoiceState.isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.send),
                     label: const Text('Crear Factura Electrónica'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(double.infinity, 54),
@@ -105,25 +107,23 @@ class _InvoiceFormPageState extends ConsumerState<InvoiceFormPage> {
   Future<void> _createInvoice() async {
     final draft = ref.read(invoiceDraftProvider);
     final referenceCode = const Uuid().v4().substring(0, 8).toUpperCase();
-    
+
     final request = draft.toRequest(referenceCode);
-    
+
     if (request != null) {
-      final success = await ref.read(invoiceNotifierProvider.notifier).createInvoice(request);
-      
+      final success = await ref
+          .read(invoiceNotifierProvider.notifier)
+          .validateInvoice(request);
+
       if (!mounted) return;
-      
+
       if (success) {
         ref.read(invoiceDraftProvider.notifier).reset();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Factura creada exitosamente')),
-        );
-        // Podríamos navegar a la lista de facturas o mostrar el detalle
+        UIUtils.showSuccessSnackBar(context, 'Factura creada exitosamente');
       } else {
         final error = ref.read(invoiceNotifierProvider).error;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $error')),
-        );
+        UIUtils.showErrorSnackBar(
+            context, error ?? 'Ocurrió un error al crear la factura');
       }
     }
   }
@@ -142,9 +142,12 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(fontWeight: FontWeight.bold),
         ),
-        ?trailing,
+        if (trailing != null) trailing!,
       ],
     );
   }
@@ -161,7 +164,8 @@ class _CustomerCard extends StatelessWidget {
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.person)),
         title: Text(customer.name),
-        subtitle: Text('${customer.identificationType}: ${customer.identification}\n${customer.email}'),
+        subtitle: Text(
+            '${customer.identificationType}: ${customer.identification}\n${customer.email}'),
         isThreeLine: true,
       ),
     );
@@ -187,12 +191,15 @@ class _ProductItemRow extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text('Ref: ${item.product.code}', style: Theme.of(context).textTheme.bodySmall),
+                      Text(item.product.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text('Ref: ${item.product.code}',
+                          style: Theme.of(context).textTheme.bodySmall),
                     ],
                   ),
                 ),
-                Text('\$${item.total.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('\$${item.total.toStringAsFixed(2)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             const Divider(),
@@ -203,18 +210,25 @@ class _ProductItemRow extends ConsumerWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline),
-                      onPressed: () => ref.read(invoiceDraftProvider.notifier).updateQuantity(item.product.id!, item.quantity - 1),
+                      onPressed: () => ref
+                          .read(invoiceDraftProvider.notifier)
+                          .updateQuantity(item.product.id!, item.quantity - 1),
                     ),
-                    Text(item.quantity.toStringAsFixed(0), style: const TextStyle(fontSize: 16)),
+                    Text(item.quantity.toStringAsFixed(0),
+                        style: const TextStyle(fontSize: 16)),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline),
-                      onPressed: () => ref.read(invoiceDraftProvider.notifier).updateQuantity(item.product.id!, item.quantity + 1),
+                      onPressed: () => ref
+                          .read(invoiceDraftProvider.notifier)
+                          .updateQuantity(item.product.id!, item.quantity + 1),
                     ),
                   ],
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () => ref.read(invoiceDraftProvider.notifier).removeProduct(item.product.id!),
+                  onPressed: () => ref
+                      .read(invoiceDraftProvider.notifier)
+                      .removeProduct(item.product.id!),
                 ),
               ],
             ),
@@ -241,8 +255,8 @@ class _SummaryCard extends StatelessWidget {
             _SummaryRow(label: 'IVA', value: draft.totalTax),
             const Divider(),
             _SummaryRow(
-              label: 'Total', 
-              value: draft.total, 
+              label: 'Total',
+              value: draft.total,
               isBold: true,
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -259,7 +273,8 @@ class _SummaryRow extends StatelessWidget {
   final bool isBold;
   final Color? color;
 
-  const _SummaryRow({required this.label, required this.value, this.isBold = false, this.color});
+  const _SummaryRow(
+      {required this.label, required this.value, this.isBold = false, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -309,12 +324,13 @@ class _CustomerSearchSheet extends ConsumerStatefulWidget {
   const _CustomerSearchSheet();
 
   @override
-  ConsumerState<_CustomerSearchSheet> createState() => __CustomerSearchSheetState();
+  ConsumerState<_CustomerSearchSheet> createState() =>
+      __CustomerSearchSheetState();
 }
 
 class __CustomerSearchSheetState extends ConsumerState<_CustomerSearchSheet> {
   final _controller = TextEditingController();
-  String _docType = '13';
+  String _docType = '1'; // Usamos los IDs reales de Factus V1
 
   @override
   Widget build(BuildContext context) {
@@ -323,7 +339,9 @@ class __CustomerSearchSheetState extends ConsumerState<_CustomerSearchSheet> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 20, right: 20, top: 20,
+        left: 20,
+        right: 20,
+        top: 20,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -333,11 +351,12 @@ class __CustomerSearchSheetState extends ConsumerState<_CustomerSearchSheet> {
           DropdownButtonFormField<String>(
             initialValue: _docType,
             items: const [
-              DropdownMenuItem(value: '13', child: Text('Cédula de ciudadanía')),
-              DropdownMenuItem(value: '31', child: Text('NIT')),
+              DropdownMenuItem(value: '1', child: Text('Cédula de ciudadanía')),
+              DropdownMenuItem(value: '3', child: Text('NIT')),
             ],
             onChanged: (v) => setState(() => _docType = v!),
-            decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Tipo'),
+            decoration: const InputDecoration(
+                border: OutlineInputBorder(), labelText: 'Tipo'),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -355,25 +374,25 @@ class __CustomerSearchSheetState extends ConsumerState<_CustomerSearchSheet> {
           else
             FilledButton(
               onPressed: () async {
-                await ref.read(customerNotifierProvider.notifier).searchCustomer(
-                  identificationDocumentCode: _docType,
-                  identificationNumber: _controller.text.trim(),
-                );
-                
+                await ref
+                    .read(customerNotifierProvider.notifier)
+                    .searchCustomer(
+                      identificationDocumentCode: _docType,
+                      identificationNumber: _controller.text.trim(),
+                    );
+
                 if (!context.mounted) return;
-                
+
                 final found = ref.read(customerNotifierProvider).customer;
                 if (found != null) {
                   ref.read(invoiceDraftProvider.notifier).setCustomer(found);
                   Navigator.pop(context);
+                } else if (ref.read(customerNotifierProvider).error != null) {
+                  UIUtils.showErrorSnackBar(
+                      context, ref.read(customerNotifierProvider).error!);
                 }
               },
               child: const Text('Buscar y Seleccionar'),
-            ),
-          if (customerState.error != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(customerState.error!, style: const TextStyle(color: Colors.red)),
             ),
           const SizedBox(height: 20),
         ],
@@ -386,7 +405,8 @@ class _ProductSearchSheet extends ConsumerStatefulWidget {
   const _ProductSearchSheet();
 
   @override
-  ConsumerState<_ProductSearchSheet> createState() => _ProductSearchSheetState();
+  ConsumerState<_ProductSearchSheet> createState() =>
+      _ProductSearchSheetState();
 }
 
 class _ProductSearchSheetState extends ConsumerState<_ProductSearchSheet> {
@@ -407,26 +427,30 @@ class _ProductSearchSheetState extends ConsumerState<_ProductSearchSheet> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          Text('Catálogo de Productos', style: Theme.of(context).textTheme.titleLarge),
+          Text('Catálogo de Productos',
+              style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           Expanded(
-            child: productState.isLoading 
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  itemCount: productState.products.length,
-                  itemBuilder: (context, index) {
-                    final product = productState.products[index];
-                    return ListTile(
-                      title: Text(product.name),
-                      subtitle: Text('Ref: ${product.code} - \$${product.price}'),
-                      trailing: const Icon(Icons.add_circle_outline),
-                      onTap: () {
-                        ref.read(invoiceDraftProvider.notifier).addProduct(product);
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
+            child: productState.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: productState.products.length,
+                    itemBuilder: (context, index) {
+                      final product = productState.products[index];
+                      return ListTile(
+                        title: Text(product.name),
+                        subtitle:
+                            Text('Ref: ${product.code} - \$${product.price}'),
+                        trailing: const Icon(Icons.add_circle_outline),
+                        onTap: () {
+                          ref
+                              .read(invoiceDraftProvider.notifier)
+                              .addProduct(product);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
       ),

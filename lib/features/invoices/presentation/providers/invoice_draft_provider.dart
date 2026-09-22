@@ -4,7 +4,6 @@ import '../../../customer/domain/entities/customer.dart';
 import '../../../products/domain/entities/product.dart';
 import '../../data/models/create_invoice_request.dart';
 
-
 class InvoiceDraft {
   final Customer? customer;
   final List<InvoiceItemDraft> items;
@@ -42,8 +41,9 @@ class InvoiceDraft {
     return CreateInvoiceRequest(
       referenceCode: referenceCode,
       customer: CustomerRequest(
-        identification: int.tryParse(customer!.identification) ?? 0,
-        identificationType: customer!.identificationType,
+        identification: customer!.identification,
+        // En V1, los IDs suelen ser enteros. Mapeamos los códigos conocidos.
+        identificationDocumentId: _mapDocTypeToV1Id(customer!.identificationType),
         names: customer!.name,
         email: customer!.email,
         phone: customer!.phone,
@@ -56,6 +56,16 @@ class InvoiceDraft {
         paymentMethodCode: paymentMethodCode,
       ),
     );
+  }
+
+  int _mapDocTypeToV1Id(String type) {
+    switch (type) {
+      case '13': return 1; // Cédula
+      case '31': return 3; // NIT
+      case '22': return 2; // Extranjería
+      case '41': return 4; // Pasaporte
+      default: return int.tryParse(type) ?? 1;
+    }
   }
 }
 
@@ -87,15 +97,32 @@ class InvoiceItemDraft {
       name: product.name,
       quantity: quantity,
       price: product.price,
-      unitMeasureCode: product.unitMeasureCode,
-      standardCode: product.standardCode,
+      taxRate: product.taxRate,
+      discountRate: 0,
+      // Mapeo de IDs comunes para Factus V1
+      // Unidad (94 en V2) suele ser 70 en V1
+      unitMeasureId: _mapUnitMeasure(product.unitMeasureCode),
+      // Estándar de adopción del contribuyente (999 en V2) suele ser 1 en V1
+      standardCodeId: _mapStandardCode(product.standardCode),
+      isExcluded: 0,
+      tributeId: 1, // 1 = IVA
       taxes: [
         InvoiceTaxRequest(
-          tax: '01', // IVA
+          tax: '01',
           taxRate: product.taxRate,
         ),
       ],
     );
+  }
+
+  int _mapUnitMeasure(String code) {
+    if (code == '94') return 70; // Unidad
+    return int.tryParse(code) ?? 70;
+  }
+
+  int _mapStandardCode(String code) {
+    if (code == '999') return 1; // Estándar de adopción del contribuyente
+    return int.tryParse(code) ?? 1;
   }
 }
 

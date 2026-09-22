@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../../core/exceptions/app_exception.dart';
 
 import '../../data/models/create_invoice_request.dart';
 import '../../domain/entities/invoice.dart';
@@ -67,7 +68,10 @@ class InvoiceNotifier extends StateNotifier<InvoiceState> {
         lastPage: result.lastPage,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false, 
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 
@@ -91,33 +95,13 @@ class InvoiceNotifier extends StateNotifier<InvoiceState> {
         lastPage: result.lastPage,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-
-  Future<bool> createInvoice(CreateInvoiceRequest request) async {
-    state = state.copyWith(isLoading: true, error: null, clearLastResponse: true);
-
-    try {
-      final response = await repository.createInvoice(request);
-
-      state = state.copyWith(
-        isLoading: false,
-        lastResponse: response,
-      );
-
-      // Si la creación fue exitosa, recargamos la lista
-      await loadInvoices();
-      
-      return true;
-    } catch (e) {
       state = state.copyWith(
         isLoading: false, 
-        error: e.toString(),
+        error: e is AppException ? e.message : e.toString(),
       );
-      return false;
     }
   }
+
 
   Future<bool> validateInvoice(CreateInvoiceRequest request) async {
     state = state.copyWith(isLoading: true, error: null, clearLastResponse: true);
@@ -130,11 +114,13 @@ class InvoiceNotifier extends StateNotifier<InvoiceState> {
         lastResponse: response,
       );
       
+      await loadInvoices();
+      
       return true;
     } catch (e) {
       state = state.copyWith(
         isLoading: false, 
-        error: e.toString(),
+        error: e is AppException ? e.message : e.toString(),
       );
       return false;
     }

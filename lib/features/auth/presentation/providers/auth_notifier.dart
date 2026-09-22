@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../../core/exceptions/app_exception.dart';
 
 import '../../data/models/auth_model.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -33,7 +34,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       state = state.copyWith(isLoading: false, auth: auth);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false, 
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 }

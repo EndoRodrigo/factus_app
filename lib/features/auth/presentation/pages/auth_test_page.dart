@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
+import '../../../../core/presentation/utils/ui_utils.dart';
 import '../../../home/presentation/page/home_page.dart';
 import '../providers/auth_notifier.dart';
 
@@ -14,8 +14,8 @@ class AuthTestPage extends ConsumerWidget {
 
     ref.listen<AuthState>(
       authNotifierProvider,
-          (previous, next) {
-          // Autenticación exitosa
+      (previous, next) {
+        // Autenticación exitosa
         if (previous?.auth == null && next.auth != null) {
           Navigator.pushReplacement(
             context,
@@ -23,6 +23,11 @@ class AuthTestPage extends ConsumerWidget {
               builder: (context) => const HomePage(),
             ),
           );
+        }
+
+        // Error de autenticación
+        if (next.error != null && previous?.error != next.error) {
+          UIUtils.showErrorSnackBar(context, next.error!);
         }
       },
     );
@@ -47,17 +52,13 @@ class AuthTestPage extends ConsumerWidget {
                 height: 300,
                 alignment: Alignment.topCenter,
               ),
-
               const SizedBox(height: 24),
-
               if (authState.isLoading)
                 const CircularProgressIndicator()
               else
                 ElevatedButton(
                   onPressed: () {
-                    ref
-                        .read(authNotifierProvider.notifier)
-                        .login();
+                    ref.read(authNotifierProvider.notifier).login();
                   },
                   child: const Text(
                     'Iniciar sesión',
@@ -66,17 +67,6 @@ class AuthTestPage extends ConsumerWidget {
                     ),
                   ),
                 ),
-
-              if (authState.error != null) ...[
-                const SizedBox(height: 20),
-                Text(
-                  authState.error!,
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
             ],
           ),
         ),

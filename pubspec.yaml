@@ -44,6 +44,7 @@ dependencies:
   sqlite3: ^3.6.0
   pretty_dio_logger: ^1.4.0
   uuid: ^4.6.0
+  logger: ^2.8.0
 
 dev_dependencies:
   flutter_test:
