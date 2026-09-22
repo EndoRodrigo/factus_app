@@ -20,6 +20,8 @@ class ProductRepositoryImpl implements ProductRepository {
             price: product.price,
             taxRate: product.taxRate,
             description: product.description,
+            unitMeasureCode: product.unitMeasureCode,
+            standardCode: product.standardCode,
             isActive: product.isActive,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
@@ -43,6 +45,8 @@ class ProductRepositoryImpl implements ProductRepository {
       price: product.price,
       taxRate: product.taxRate,
       description: product.description,
+      unitMeasureCode: product.unitMeasureCode,
+      standardCode: product.standardCode,
       isActive: product.isActive,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
@@ -56,6 +60,8 @@ class ProductRepositoryImpl implements ProductRepository {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
   }) {
     return localDataSource.createProduct(
       name: name,
@@ -63,6 +69,8 @@ class ProductRepositoryImpl implements ProductRepository {
       price: price,
       taxRate: taxRate,
       description: description,
+      unitMeasureCode: unitMeasureCode,
+      standardCode: standardCode,
     );
   }
 
@@ -74,6 +82,8 @@ class ProductRepositoryImpl implements ProductRepository {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
     required bool isActive,
   }) {
     return localDataSource.updateProduct(
@@ -83,6 +93,8 @@ class ProductRepositoryImpl implements ProductRepository {
       price: price,
       taxRate: taxRate,
       description: description,
+      unitMeasureCode: unitMeasureCode,
+      standardCode: standardCode,
       isActive: isActive,
     );
   }

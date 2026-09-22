@@ -15,5 +15,6 @@ final invoiceRemoteDataSourceProvider = Provider<InvoiceRemoteDataSource>((
 
 final invoiceRepositoryProvider = Provider<InvoiceRepository>((ref) {
   final remoteDataSource = ref.watch(invoiceRemoteDataSourceProvider);
+
   return InvoiceRepositoryImpl(remoteDataSource);
 });

@@ -14,6 +14,10 @@ class Products extends Table {
 
   TextColumn get description => text().nullable()();
 
+  TextColumn get unitMeasureCode => text().withDefault(const Constant('94'))();
+
+  TextColumn get standardCode => text().withDefault(const Constant('999'))();
+
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 
   DateTimeColumn get createdAt => dateTime()();

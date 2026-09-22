@@ -26,6 +26,8 @@ class _ProductFormPageState extends ConsumerState<ProductFormPage> {
   final _priceController = TextEditingController();
   final _taxRateController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _unitMeasureCodeController = TextEditingController(text: '94');
+  final _standardCodeController = TextEditingController(text: '999');
 
   bool _isActive = true;
   bool _loadingProduct = false;
@@ -69,6 +71,8 @@ class _ProductFormPageState extends ConsumerState<ProductFormPage> {
     _priceController.text = product.price.toStringAsFixed(2);
     _taxRateController.text = product.taxRate.toStringAsFixed(0);
     _descriptionController.text = product.description ?? '';
+    _unitMeasureCodeController.text = product.unitMeasureCode;
+    _standardCodeController.text = product.standardCode;
     _isActive = product.isActive;
   }
 
@@ -79,6 +83,8 @@ class _ProductFormPageState extends ConsumerState<ProductFormPage> {
     _priceController.dispose();
     _taxRateController.dispose();
     _descriptionController.dispose();
+    _unitMeasureCodeController.dispose();
+    _standardCodeController.dispose();
 
     super.dispose();
   }
@@ -93,6 +99,8 @@ class _ProductFormPageState extends ConsumerState<ProductFormPage> {
     final price = double.parse(_priceController.text);
     final taxRate = double.parse(_taxRateController.text);
     final description = _descriptionController.text.trim();
+    final unitMeasureCode = _unitMeasureCodeController.text.trim();
+    final standardCode = _standardCodeController.text.trim();
 
     final notifier = ref.read(productNotifierProvider.notifier);
 
@@ -106,6 +114,8 @@ class _ProductFormPageState extends ConsumerState<ProductFormPage> {
         price: price,
         taxRate: taxRate,
         description: description.isEmpty ? null : description,
+        unitMeasureCode: unitMeasureCode,
+        standardCode: standardCode,
         isActive: _isActive,
       );
     } else {
@@ -115,6 +125,8 @@ class _ProductFormPageState extends ConsumerState<ProductFormPage> {
         price: price,
         taxRate: taxRate,
         description: description.isEmpty ? null : description,
+        unitMeasureCode: unitMeasureCode,
+        standardCode: standardCode,
       );
     }
 
@@ -206,56 +218,104 @@ class _ProductFormPageState extends ConsumerState<ProductFormPage> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _priceController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    decoration: const InputDecoration(
-                      labelText: 'Precio',
-                      hintText: 'Ej. 50000',
-                      prefixIcon: Icon(Icons.attach_money),
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ingresa el precio';
-                      }
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _priceController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Precio',
+                            hintText: 'Ej. 50000',
+                            prefixIcon: Icon(Icons.attach_money),
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Ingresa el precio';
+                            }
 
-                      final price = double.tryParse(value);
+                            final price = double.tryParse(value);
 
-                      if (price == null || price <= 0) {
-                        return 'Ingresa un precio válido';
-                      }
+                            if (price == null || price <= 0) {
+                              return 'Ingresa un precio válido';
+                            }
 
-                      return null;
-                    },
+                            return null;
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _taxRateController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'IVA (%)',
+                            hintText: 'Ej. 19',
+                            prefixIcon: Icon(Icons.percent),
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Ingresa el IVA';
+                            }
+
+                            final taxRate = double.tryParse(value);
+
+                            if (taxRate == null || taxRate < 0 || taxRate > 100) {
+                              return 'Ingresa un IVA entre 0 y 100';
+                            }
+
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _taxRateController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    decoration: const InputDecoration(
-                      labelText: 'IVA (%)',
-                      hintText: 'Ej. 19',
-                      prefixIcon: Icon(Icons.percent),
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ingresa el IVA';
-                      }
-
-                      final taxRate = double.tryParse(value);
-
-                      if (taxRate == null || taxRate < 0 || taxRate > 100) {
-                        return 'Ingresa un IVA entre 0 y 100';
-                      }
-
-                      return null;
-                    },
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _unitMeasureCodeController,
+                          decoration: const InputDecoration(
+                            labelText: 'Unidad de medida',
+                            hintText: 'Ej. 94',
+                            prefixIcon: Icon(Icons.straighten_outlined),
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Ingresa la unidad';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _standardCodeController,
+                          decoration: const InputDecoration(
+                            labelText: 'Código estándar',
+                            hintText: 'Ej. 999',
+                            prefixIcon: Icon(Icons.code_outlined),
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Ingresa el código estándar';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   TextFormField(

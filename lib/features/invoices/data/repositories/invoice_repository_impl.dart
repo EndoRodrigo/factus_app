@@ -1,3 +1,5 @@
+import 'package:factus_app/features/invoices/data/models/create_invoice_request.dart';
+
 import '../../domain/entities/invoice_pagination.dart';
 import '../../domain/repositories/invoice_repository.dart';
 import '../datasources/invoice_remote_data_source.dart';
@@ -12,5 +14,15 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
     final result = await remoteDataSource.getInvoices(page: page);
 
     return result.toEntity();
+  }
+
+  @override
+  Future<Map<String, dynamic>> createInvoice(CreateInvoiceRequest request) {
+    return remoteDataSource.createInvoice(request);
+  }
+
+  @override
+  Future<Map<String, dynamic>> validateInvoice(CreateInvoiceRequest request) {
+    return remoteDataSource.validateInvoice(request);
   }
 }

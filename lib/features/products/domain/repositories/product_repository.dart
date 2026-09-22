@@ -11,6 +11,8 @@ abstract class ProductRepository {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
   });
 
   Future<bool> updateProduct({
@@ -20,6 +22,8 @@ abstract class ProductRepository {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
     required bool isActive,
   });
 

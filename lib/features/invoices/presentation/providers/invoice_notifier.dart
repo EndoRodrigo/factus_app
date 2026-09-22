@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../data/models/create_invoice_request.dart';
 import '../../domain/entities/invoice.dart';
 import '../../domain/repositories/invoice_repository.dart';
 import 'invoice_provider.dart';
@@ -11,6 +12,7 @@ class InvoiceState {
   final int currentPage;
   final int lastPage;
   final String? error;
+  final Map<String, dynamic>? lastResponse;
 
   const InvoiceState({
     this.isLoading = false,
@@ -19,6 +21,7 @@ class InvoiceState {
     this.currentPage = 1,
     this.lastPage = 1,
     this.error,
+    this.lastResponse,
   });
 
   bool get hasNextPage => currentPage < lastPage;
@@ -30,6 +33,8 @@ class InvoiceState {
     int? currentPage,
     int? lastPage,
     String? error,
+    Map<String, dynamic>? lastResponse,
+    bool clearLastResponse = false,
   }) {
     return InvoiceState(
       isLoading: isLoading ?? this.isLoading,
@@ -38,6 +43,7 @@ class InvoiceState {
       currentPage: currentPage ?? this.currentPage,
       lastPage: lastPage ?? this.lastPage,
       error: error,
+      lastResponse: clearLastResponse ? null : lastResponse ?? this.lastResponse,
     );
   }
 }
@@ -87,6 +93,55 @@ class InvoiceNotifier extends StateNotifier<InvoiceState> {
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
+  }
+
+  Future<bool> createInvoice(CreateInvoiceRequest request) async {
+    state = state.copyWith(isLoading: true, error: null, clearLastResponse: true);
+
+    try {
+      final response = await repository.createInvoice(request);
+
+      state = state.copyWith(
+        isLoading: false,
+        lastResponse: response,
+      );
+
+      // Si la creación fue exitosa, recargamos la lista
+      await loadInvoices();
+      
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false, 
+        error: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> validateInvoice(CreateInvoiceRequest request) async {
+    state = state.copyWith(isLoading: true, error: null, clearLastResponse: true);
+
+    try {
+      final response = await repository.validateInvoice(request);
+
+      state = state.copyWith(
+        isLoading: false,
+        lastResponse: response,
+      );
+      
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false, 
+        error: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  void clearError() {
+    state = state.copyWith(error: null);
   }
 }
 

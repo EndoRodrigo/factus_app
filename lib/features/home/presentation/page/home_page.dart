@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../customer/presentation/pages/customer_test_page.dart';
 import '../../../establishment/presentation/pages/profile_page.dart';
+import '../../../invoices/presentation/pages/invoice_form_page.dart';
 import '../../../invoices/presentation/pages/invoices_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,7 +25,7 @@ class _HomePageState extends State<HomePage> {
       },
     ),
     const InvoicesPage(),
-    const _CreateInvoicePage(),
+    const InvoiceFormPage(),
   ];
 
   final List<String> _titles = const [
@@ -317,33 +318,6 @@ class _ActionCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _CreateInvoicePage extends StatelessWidget {
-  const _CreateInvoicePage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Text(
-            'Crear factura',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => CustomerTestPage()),
-              );
-            },
-            child: const Text('Probar cliente'),
-          ),
-        ],
       ),
     );
   }

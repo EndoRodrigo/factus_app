@@ -5,4 +5,6 @@ class ApiConstants {
   static const String billsEndpoint = '/v1/bills';
   static const String municipalities = '/v1/municipalities';
   static const String acquirerEndpoint = '/v1/dian/acquirer';
+  static const String validateBillEndpoint = '/v1/bills/validate';
+  static const String createBillEndpoint = '/v1/bills';
 }

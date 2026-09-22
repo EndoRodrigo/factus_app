@@ -25,6 +25,8 @@ class ProductLocalDataSource {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
   }) {
     final now = DateTime.now();
 
@@ -35,6 +37,8 @@ class ProductLocalDataSource {
             price: price,
             taxRate: Value(taxRate),
             description: Value(description),
+            unitMeasureCode: Value(unitMeasureCode),
+            standardCode: Value(standardCode),
             createdAt: now,
             updatedAt: now,
           ),
@@ -48,6 +52,8 @@ class ProductLocalDataSource {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
     required bool isActive,
   }) {
     return (database.update(database.products)
@@ -59,6 +65,8 @@ class ProductLocalDataSource {
             price: Value(price),
             taxRate: Value(taxRate),
             description: Value(description),
+            unitMeasureCode: Value(unitMeasureCode),
+            standardCode: Value(standardCode),
             isActive: Value(isActive),
             updatedAt: Value(DateTime.now()),
           ),

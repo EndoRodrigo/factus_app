@@ -87,6 +87,8 @@ class ProductNotifier extends StateNotifier<ProductState> {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
   }) async {
     state = state.copyWith(
       isLoading: true,
@@ -100,6 +102,8 @@ class ProductNotifier extends StateNotifier<ProductState> {
         price: price,
         taxRate: taxRate,
         description: description,
+        unitMeasureCode: unitMeasureCode,
+        standardCode: standardCode,
       );
 
       await loadProducts();
@@ -122,6 +126,8 @@ class ProductNotifier extends StateNotifier<ProductState> {
     required double price,
     required double taxRate,
     String? description,
+    required String unitMeasureCode,
+    required String standardCode,
     required bool isActive,
   }) async {
     state = state.copyWith(
@@ -137,6 +143,8 @@ class ProductNotifier extends StateNotifier<ProductState> {
         price: price,
         taxRate: taxRate,
         description: description,
+        unitMeasureCode: unitMeasureCode,
+        standardCode: standardCode,
         isActive: isActive,
       );
 
