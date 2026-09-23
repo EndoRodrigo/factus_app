@@ -13,7 +13,6 @@ class TokenStorage {
     required String refreshToken,
   }) async {
     await storage.write(key: _accessTokenKey, value: accessToken);
-
     await storage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
@@ -27,7 +26,6 @@ class TokenStorage {
 
   Future<void> clearTokens() async {
     await storage.delete(key: _accessTokenKey);
-
     await storage.delete(key: _refreshTokenKey);
   }
 }

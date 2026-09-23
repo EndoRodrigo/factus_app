@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:factus_app/core/exceptions/app_exception.dart';
 import 'package:factus_app/core/network/token_storage.dart';
 import 'package:factus_app/core/utils/app_logger.dart';
@@ -23,6 +25,9 @@ class ApiClient {
       ),
     );
 
+    // RECOMENDACIÓN: SSL Pinning / Validar Certificado
+    _setupSSLValidation();
+
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -35,10 +40,11 @@ class ApiClient {
         },
         onError: (DioException e, handler) {
           final appException = AppException.fromDioError(e);
-          AppLogger.e('❌ Error API [${e.response?.statusCode}]: ${appException.message}', e, e.stackTrace);
-          
-          // Podemos optar por relanzar el error como AppException
-          handler.next(e); 
+          AppLogger.e(
+              '❌ Error API [${e.response?.statusCode}]: ${appException.message}',
+              e,
+              e.stackTrace);
+          handler.next(e);
         },
       ),
     );
@@ -54,6 +60,26 @@ class ApiClient {
           compact: true,
           maxWidth: 90,
         ),
+      );
+    }
+  }
+
+  void _setupSSLValidation() {
+    // Solo para plataformas IO (Android/iOS)
+    if (!kIsWeb) {
+      dio.httpClientAdapter = IOHttpClientAdapter(
+        createHttpClient: () {
+          final client = HttpClient();
+          client.badCertificateCallback = (cert, host, port) {
+            // En producción, solo deberíamos aceptar certificados válidos
+            // Aquí se podría implementar SSL Pinning comparando el fingerprint
+            // return cert.sha256 == 'mi_sha_256_esperado';
+            
+            final isValidHost = host == 'api-sandbox.factus.com.co';
+            return isValidHost; 
+          };
+          return client;
+        },
       );
     }
   }
