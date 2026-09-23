@@ -1,6 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/exceptions/app_exception.dart';
 import '../../domain/entities/product.dart';
-import '../../domain/repositories/product_repository.dart';
+import '../../domain/usecases/create_product_usecase.dart';
+import '../../domain/usecases/delete_product_usecase.dart';
+import '../../domain/usecases/get_product_by_id_usecase.dart';
+import '../../domain/usecases/get_products_usecase.dart';
+import '../../domain/usecases/update_product_usecase.dart';
 import 'product_providers.dart';
 
 class ProductState {
@@ -33,11 +38,19 @@ class ProductState {
 }
 
 class ProductNotifier extends Notifier<ProductState> {
-  late final ProductRepository _repository;
+  late final GetProductsUseCase _getProductsUseCase;
+  late final GetProductByIdUseCase _getProductByIdUseCase;
+  late final CreateProductUseCase _createProductUseCase;
+  late final UpdateProductUseCase _updateProductUseCase;
+  late final DeleteProductUseCase _deleteProductUseCase;
 
   @override
   ProductState build() {
-    _repository = ref.watch(productRepositoryProvider);
+    _getProductsUseCase = ref.watch(getProductsUseCaseProvider);
+    _getProductByIdUseCase = ref.watch(getProductByIdUseCaseProvider);
+    _createProductUseCase = ref.watch(createProductUseCaseProvider);
+    _updateProductUseCase = ref.watch(updateProductUseCaseProvider);
+    _deleteProductUseCase = ref.watch(deleteProductUseCaseProvider);
     return const ProductState();
   }
 
@@ -45,20 +58,25 @@ class ProductNotifier extends Notifier<ProductState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final products = await _repository.getProducts();
+      final products = await _getProductsUseCase();
       state = state.copyWith(isLoading: false, products: products);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 
   Future<Product?> getProductById(int id) async {
     try {
-      final product = await _repository.getProductById(id);
+      final product = await _getProductByIdUseCase(id);
       state = state.copyWith(selectedProduct: product);
       return product;
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(
+        error: e is AppException ? e.message : e.toString(),
+      );
       return null;
     }
   }
@@ -75,7 +93,7 @@ class ProductNotifier extends Notifier<ProductState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await _repository.createProduct(
+      await _createProductUseCase(
         name: name,
         code: code,
         price: price,
@@ -87,7 +105,10 @@ class ProductNotifier extends Notifier<ProductState> {
       await loadProducts();
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
       return false;
     }
   }
@@ -106,7 +127,7 @@ class ProductNotifier extends Notifier<ProductState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final updated = await _repository.updateProduct(
+      final updated = await _updateProductUseCase(
         id: id,
         name: name,
         code: code,
@@ -120,7 +141,10 @@ class ProductNotifier extends Notifier<ProductState> {
       if (updated) await loadProducts();
       return updated;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
       return false;
     }
   }
@@ -129,11 +153,14 @@ class ProductNotifier extends Notifier<ProductState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final deleted = await _repository.deleteProduct(id);
+      final deleted = await _deleteProductUseCase(id);
       if (deleted) await loadProducts();
       return deleted;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
       return false;
     }
   }

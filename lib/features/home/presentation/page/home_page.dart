@@ -1,8 +1,7 @@
-import 'package:factus_app/features/products/presentation/pages/products_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../customer/presentation/pages/customer_test_page.dart';
-import '../../../establishment/presentation/pages/profile_page.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../invoices/presentation/pages/invoice_form_page.dart';
 import '../../../invoices/presentation/pages/invoices_page.dart';
 
@@ -44,10 +43,7 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.account_circle_outlined),
             tooltip: 'Mi perfil',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfilePage()),
-              );
+              context.push(AppRoutes.profile);
             },
           ),
         ],
@@ -102,11 +98,7 @@ class _HomePageState extends State<HomePage> {
                 title: const Text('Consultar clientes'),
                 onTap: () {
                   Navigator.pop(context);
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CustomerTestPage()),
-                  );
+                  context.push(AppRoutes.customerSearch);
                 },
               ),
 
@@ -125,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                 title: const Text('Productos'),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductsPage()));
+                  context.push(AppRoutes.products);
                 },
               ),
             ],

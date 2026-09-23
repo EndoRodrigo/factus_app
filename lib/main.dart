@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/presentation/pages/login_page.dart';
 
 void main() {
   runApp(const ProviderScope(child: FactusApp()));
 }
 
-class FactusApp extends StatelessWidget {
+class FactusApp extends ConsumerWidget {
   const FactusApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(goRouterProvider);
+
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Factus App',
       theme: AppTheme.lightTheme,
-      home: const LoginPage(),
+      routerConfig: router,
     );
   }
 }

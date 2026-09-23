@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import '../../../../core/constants/app_errors.dart';
 import '../../../../core/database/app_database.dart';
 import '../../domain/entities/establishment.dart';
 import '../../domain/repositories/establishment_repository.dart';
@@ -36,7 +37,7 @@ class EstablishmentRepositoryImpl implements EstablishmentRepository {
   Future<void> updateEstablishment(Establishment establishment) async {
     final id = establishment.id;
     if (id == null) {
-      throw ArgumentError('No se puede actualizar un establecimiento sin id');
+      throw ArgumentError(AppErrorMessages.establishmentWithoutId);
     }
 
     final data = EstablishmentTableData(

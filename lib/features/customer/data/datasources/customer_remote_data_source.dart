@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/constants/app_errors.dart';
 import '../../../../core/exceptions/app_exception.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../models/customer_model.dart';
@@ -23,7 +24,7 @@ class CustomerRemoteDataSource {
 
       final data = response.data['data'];
       if (data == null || data is! Map) {
-        throw AppException(message: 'Cliente no encontrado');
+        throw AppException(message: AppErrorMessages.customerNotFound);
       }
 
       return CustomerModel.fromJson(Map<String, dynamic>.from(data));

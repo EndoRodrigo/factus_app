@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/exceptions/app_exception.dart';
 import '../../data/models/create_invoice_request.dart';
 import '../../domain/entities/invoice.dart';
-import '../../domain/repositories/invoice_repository.dart';
+import '../../domain/usecases/get_invoices_usecase.dart';
+import '../../domain/usecases/validate_invoice_usecase.dart';
 import 'invoice_provider.dart';
 
 class InvoiceState {
@@ -49,11 +50,13 @@ class InvoiceState {
 }
 
 class InvoiceNotifier extends Notifier<InvoiceState> {
-  late final InvoiceRepository _repository;
+  late final GetInvoicesUseCase _getInvoicesUseCase;
+  late final ValidateInvoiceUseCase _validateInvoiceUseCase;
 
   @override
   InvoiceState build() {
-    _repository = ref.watch(invoiceRepositoryProvider);
+    _getInvoicesUseCase = ref.watch(getInvoicesUseCaseProvider);
+    _validateInvoiceUseCase = ref.watch(validateInvoiceUseCaseProvider);
     return const InvoiceState();
   }
 
@@ -61,7 +64,7 @@ class InvoiceNotifier extends Notifier<InvoiceState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final result = await _repository.getInvoices(page: 1);
+      final result = await _getInvoicesUseCase(page: 1);
       state = state.copyWith(
         isLoading: false,
         invoices: result.invoices,
@@ -83,7 +86,7 @@ class InvoiceNotifier extends Notifier<InvoiceState> {
     try {
       state = state.copyWith(isLoading: true, error: null);
       final nextPage = state.currentPage + 1;
-      final result = await _repository.getInvoices(page: nextPage);
+      final result = await _getInvoicesUseCase(page: nextPage);
 
       state = state.copyWith(
         isLoading: false,
@@ -104,7 +107,7 @@ class InvoiceNotifier extends Notifier<InvoiceState> {
     state = state.copyWith(isLoading: true, error: null, clearLastResponse: true);
 
     try {
-      final response = await _repository.validateInvoice(request);
+      final response = await _validateInvoiceUseCase(request);
       state = state.copyWith(isLoading: false, lastResponse: response);
       await loadInvoices();
       return true;

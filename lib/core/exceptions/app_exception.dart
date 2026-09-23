@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../constants/app_errors.dart';
 
 class AppException implements Exception {
   final String message;
@@ -12,15 +13,15 @@ class AppException implements Exception {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return AppException(message: 'Tiempo de espera agotado con el servidor');
+        return AppException(message: AppErrorMessages.connectionTimeout);
       case DioExceptionType.badResponse:
         return _handleBadResponse(error.response);
       case DioExceptionType.cancel:
-        return AppException(message: 'Petición cancelada');
+        return AppException(message: AppErrorMessages.requestCancelled);
       case DioExceptionType.connectionError:
-        return AppException(message: 'Sin conexión a internet');
+        return AppException(message: AppErrorMessages.noInternet);
       default:
-        return AppException(message: 'Ocurrió un error inesperado');
+        return AppException(message: AppErrorMessages.unexpectedError);
     }
   }
 
@@ -30,7 +31,7 @@ class AppException implements Exception {
 
     if (statusCode == 422) {
       final Map<String, dynamic>? errors = data['data']?['errors'];
-      String message = 'Error de validación';
+      String message = AppErrorMessages.validationError;
       
       if (errors != null && errors.isNotEmpty) {
         // Tomamos el primer error para mostrar un mensaje amigable
@@ -48,11 +49,15 @@ class AppException implements Exception {
     }
 
     if (statusCode == 401) {
-      return AppException(message: 'Sesión expirada o no autorizada', code: 'unauthorized');
+      return AppException(
+        message: AppErrorMessages.unauthorized,
+        code: 'unauthorized',
+      );
     }
 
     return AppException(
-      message: data['message']?.toString() ?? 'Error en el servidor ($statusCode)',
+      message:
+          data['message']?.toString() ?? AppErrorMessages.serverError(statusCode),
       code: 'server_error',
     );
   }

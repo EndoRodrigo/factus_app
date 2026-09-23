@@ -122,18 +122,21 @@ assets/
 
 # 🔒 Seguridad
 
-Las credenciales utilizadas para acceder a Factus API **no deben incluirse directamente en el repositorio**.
+Las credenciales utilizadas para acceder a Factus API **no se incluyen directamente en el repositorio de código fuente**.
 
-Para desarrollo se utilizan variables:
+Se utiliza un archivo `.env` fuera del control de versiones (basado en el archivo de plantilla `.env.example`):
 
-```bash
---dart-define=FACTUS_CLIENT_ID=...
---dart-define=FACTUS_CLIENT_SECRET=...
---dart-define=FACTUS_USERNAME=...
---dart-define=FACTUS_PASSWORD=...
-```
+1. Copia `.env.example` a `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Completa tus credenciales de Factus en `.env`.
+3. Ejecuta la aplicación cargando el archivo de variables:
+   ```bash
+   flutter run --dart-define-from-file=.env
+   ```
 
-Los tokens de autenticación serán almacenados posteriormente utilizando almacenamiento seguro.
+Los tokens de acceso y las credenciales se almacenan de forma encriptada localmente mediante `FlutterSecureStorage`.
 
 ---
 
@@ -173,20 +176,16 @@ Instalar dependencias:
 flutter pub get
 ```
 
-Ejecutar:
+Configurar variables de entorno:
 
 ```bash
-flutter run
+cp .env.example .env
 ```
 
-Para ejecutar utilizando las credenciales del ambiente Sandbox:
+Ejecutar cargando el archivo `.env`:
 
 ```bash
-flutter run \
-  --dart-define=FACTUS_CLIENT_ID=TU_CLIENT_ID \
-  --dart-define=FACTUS_CLIENT_SECRET=TU_CLIENT_SECRET \
-  --dart-define=FACTUS_USERNAME=TU_USUARIO \
-  --dart-define=FACTUS_PASSWORD=TU_PASSWORD
+flutter run --dart-define-from-file=.env
 ```
 
 ---

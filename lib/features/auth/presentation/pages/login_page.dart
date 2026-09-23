@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_config.dart';
 import '../../../../core/presentation/utils/ui_utils.dart';
-import '../../../home/presentation/page/home_page.dart';
+import '../../../../core/router/app_router.dart';
 import '../providers/auth_notifier.dart';
+import '../providers/auth_providers.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -19,6 +22,32 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _obscurePassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final tokenStorage = ref.read(tokenStorageProvider);
+    final savedUsername = await tokenStorage.getUsername();
+    final savedPassword = await tokenStorage.getPassword();
+
+    if (mounted) {
+      if (savedUsername != null && savedUsername.isNotEmpty) {
+        _emailController.text = savedUsername;
+      } else if (AppConfig.username.isNotEmpty) {
+        _emailController.text = AppConfig.username;
+      }
+
+      if (savedPassword != null && savedPassword.isNotEmpty) {
+        _passwordController.text = savedPassword;
+      } else if (AppConfig.password.isNotEmpty) {
+        _passwordController.text = AppConfig.password;
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -28,9 +57,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Nota: Aquí se implementaría la lógica para pasar email/pass al notifier
-    // Por ahora usamos la carga de variables de entorno establecida
-    await ref.read(authNotifierProvider.notifier).login();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    await ref.read(authNotifierProvider.notifier).login(
+          username: email,
+          password: password,
+        );
   }
 
   @override
@@ -41,10 +74,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       authNotifierProvider,
       (previous, next) {
         if (previous?.auth == null && next.auth != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
+          context.go(AppRoutes.home);
         }
         if (next.error != null && previous?.error != next.error) {
           UIUtils.showErrorSnackBar(context, next.error!);

@@ -15,5 +15,9 @@ class AppConfig {
     'FACTUS_PASSWORD',
   );
 
+  static bool get hasClientCredentials =>
+      clientId.isNotEmpty && clientSecret.isNotEmpty;
 
+  static bool get hasUserCredentials =>
+      username.isNotEmpty && password.isNotEmpty;
 }

@@ -49,3 +49,8 @@ app.*.map.json
 
 #Base de datos
 app_database.g.dart
+
+# Variables de Entorno (Credenciales Sensibles)
+.env
+.env.*
+!.env.example

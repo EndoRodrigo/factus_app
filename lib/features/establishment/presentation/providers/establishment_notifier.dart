@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/exceptions/app_exception.dart';
 import '../../domain/entities/establishment.dart';
-import '../../domain/repositories/establishment_repository.dart';
+import '../../domain/usecases/delete_establishment_usecase.dart';
+import '../../domain/usecases/get_establishment_usecase.dart';
+import '../../domain/usecases/save_establishment_usecase.dart';
 import 'establishment_provider.dart';
 
 class EstablishmentState {
@@ -29,11 +32,15 @@ class EstablishmentState {
 }
 
 class EstablishmentNotifier extends Notifier<EstablishmentState> {
-  late final EstablishmentRepository _repository;
+  late final GetEstablishmentUseCase _getEstablishmentUseCase;
+  late final SaveEstablishmentUseCase _saveEstablishmentUseCase;
+  late final DeleteEstablishmentUseCase _deleteEstablishmentUseCase;
 
   @override
   EstablishmentState build() {
-    _repository = ref.watch(establishmentRepositoryProvider);
+    _getEstablishmentUseCase = ref.watch(getEstablishmentUseCaseProvider);
+    _saveEstablishmentUseCase = ref.watch(saveEstablishmentUseCaseProvider);
+    _deleteEstablishmentUseCase = ref.watch(deleteEstablishmentUseCaseProvider);
     return const EstablishmentState();
   }
 
@@ -41,10 +48,13 @@ class EstablishmentNotifier extends Notifier<EstablishmentState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final establishment = await _repository.getEstablishment();
+      final establishment = await _getEstablishmentUseCase();
       state = state.copyWith(isLoading: false, establishment: establishment);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 
@@ -52,10 +62,13 @@ class EstablishmentNotifier extends Notifier<EstablishmentState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await _repository.createEstablishment(establishment);
+      await _saveEstablishmentUseCase.create(establishment);
       await load();
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 
@@ -63,10 +76,13 @@ class EstablishmentNotifier extends Notifier<EstablishmentState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await _repository.updateEstablishment(establishment);
+      await _saveEstablishmentUseCase.update(establishment);
       await load();
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 
@@ -77,10 +93,13 @@ class EstablishmentNotifier extends Notifier<EstablishmentState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await _repository.deleteEstablishment(establishment!.id!);
+      await _deleteEstablishmentUseCase(establishment!.id!);
       state = state.copyWith(isLoading: false, clearEstablishment: true);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 }

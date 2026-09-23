@@ -5,6 +5,7 @@ import '../../data/datasources/reference_remote_data_source.dart';
 import '../../data/repositories/reference_repository_impl.dart';
 import '../../domain/entities/municipality.dart';
 import '../../domain/repositories/reference_repository.dart';
+import '../../domain/usecases/get_municipalities_usecase.dart';
 
 final referenceRemoteDataSourceProvider = Provider<ReferenceRemoteDataSource>((
   ref,
@@ -20,8 +21,14 @@ final referenceRepositoryProvider = Provider<ReferenceRepository>((ref) {
   return ReferenceRepositoryImpl(dataSource);
 });
 
-final municipalitiesProvider = FutureProvider<List<Municipality>>((ref) async {
+final getMunicipalitiesUseCaseProvider = Provider<GetMunicipalitiesUseCase>((ref) {
   final repository = ref.watch(referenceRepositoryProvider);
 
-  return repository.getMunicipalities();
+  return GetMunicipalitiesUseCase(repository);
+});
+
+final municipalitiesProvider = FutureProvider<List<Municipality>>((ref) async {
+  final getMunicipalitiesUseCase = ref.watch(getMunicipalitiesUseCaseProvider);
+
+  return getMunicipalitiesUseCase();
 });

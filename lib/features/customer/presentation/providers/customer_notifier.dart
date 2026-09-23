@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/exceptions/app_exception.dart';
 import '../../domain/entities/customer.dart';
-import '../../domain/repositories/customer_repository.dart';
+import '../../domain/usecases/get_customer_usecase.dart';
 import 'customer_provider.dart';
 
 class CustomerState {
@@ -20,11 +21,11 @@ class CustomerState {
 }
 
 class CustomerNotifier extends Notifier<CustomerState> {
-  late final CustomerRepository _repository;
+  late final GetCustomerUseCase _getCustomerUseCase;
 
   @override
   CustomerState build() {
-    _repository = ref.watch(customerRepositoryProvider);
+    _getCustomerUseCase = ref.watch(getCustomerUseCaseProvider);
     return const CustomerState();
   }
 
@@ -35,14 +36,17 @@ class CustomerNotifier extends Notifier<CustomerState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final customer = await _repository.getCustomer(
+      final customer = await _getCustomerUseCase(
         identificationDocumentCode: identificationDocumentCode,
         identificationNumber: identificationNumber,
       );
 
       state = state.copyWith(isLoading: false, customer: customer, error: null);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: e is AppException ? e.message : e.toString(),
+      );
     }
   }
 

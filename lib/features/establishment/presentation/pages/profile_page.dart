@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_router.dart';
+import '../../domain/entities/establishment.dart';
 import '../providers/establishment_notifier.dart';
-import 'establishment_form_page.dart';
+import '../widgets/establishment_header.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -72,7 +75,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             const SizedBox(height: 12),
             Text(
               'Registra los datos de tu establecimiento '
-                  'para utilizarlos al crear tus facturas.',
+              'para utilizarlos al crear tus facturas.',
               style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
@@ -95,7 +98,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          _buildHeader(establishment),
+          EstablishmentHeader(establishment: establishment),
           const SizedBox(height: 24),
           _buildInfoCard(establishment),
           const SizedBox(height: 24),
@@ -112,37 +115,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Widget _buildHeader(dynamic establishment) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundColor:
-          Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(
-            Icons.business,
-            size: 48,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          establishment.name,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'NIT ${establishment.nit}',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoCard(dynamic establishment) {
+  Widget _buildInfoCard(Establishment establishment) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -178,10 +151,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Widget _buildInfoRow(
-      IconData icon,
-      String label,
-      String value,
-      ) {
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -199,8 +172,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Text(
                 value,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                      fontWeight: FontWeight.w500,
+                    ),
               ),
             ],
           ),
@@ -234,9 +207,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             const SizedBox(height: 20),
             FilledButton(
               onPressed: () {
-                ref
-                    .read(establishmentNotifierProvider.notifier)
-                    .load();
+                ref.read(establishmentNotifierProvider.notifier).load();
               },
               child: const Text('Reintentar'),
             ),
@@ -247,12 +218,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _openForm() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const EstablishmentFormPage(),
-      ),
-    );
+    await context.push(AppRoutes.establishmentForm);
 
     if (!mounted) return;
 

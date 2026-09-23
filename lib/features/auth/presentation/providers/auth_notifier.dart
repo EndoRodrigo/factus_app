@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/exceptions/app_exception.dart';
 import '../../domain/entities/auth.dart';
-import '../../domain/repositories/auth_repository.dart';
+import '../../domain/usecases/login_usecase.dart';
 import 'auth_providers.dart';
 
 class AuthState {
@@ -21,19 +21,29 @@ class AuthState {
 }
 
 class AuthNotifier extends Notifier<AuthState> {
-  late final AuthRepository _repository;
+  late final LoginUseCase _loginUseCase;
 
   @override
   AuthState build() {
-    _repository = ref.watch(authRepositoryProvider);
+    _loginUseCase = ref.watch(loginUseCaseProvider);
     return const AuthState();
   }
 
-  Future<void> login() async {
+  Future<void> login({
+    String? username,
+    String? password,
+    String? clientId,
+    String? clientSecret,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final auth = await _repository.login();
+      final auth = await _loginUseCase(
+        username: username,
+        password: password,
+        clientId: clientId,
+        clientSecret: clientSecret,
+      );
       state = state.copyWith(isLoading: false, auth: auth);
     } catch (e) {
       state = state.copyWith(
@@ -43,7 +53,9 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  void logout() {
+  Future<void> logout() async {
+    final tokenStorage = ref.read(tokenStorageProvider);
+    await tokenStorage.clearTokens();
     state = const AuthState();
   }
 }

@@ -11,13 +11,32 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this.remoteDataSource, this.tokenStorage);
 
   @override
-  Future<Auth> login() async {
-    final model = await remoteDataSource.login();
+  Future<Auth> login({
+    String? username,
+    String? password,
+    String? clientId,
+    String? clientSecret,
+  }) async {
+    final model = await remoteDataSource.login(
+      username: username,
+      password: password,
+      clientId: clientId,
+      clientSecret: clientSecret,
+    );
 
     await tokenStorage.saveTokens(
       accessToken: model.accessToken,
       refreshToken: model.refreshToken,
     );
+
+    if (username != null && username.isNotEmpty && password != null && password.isNotEmpty) {
+      await tokenStorage.saveCredentials(
+        username: username,
+        password: password,
+        clientId: clientId,
+        clientSecret: clientSecret,
+      );
+    }
 
     return AuthMapper.toEntity(model);
   }

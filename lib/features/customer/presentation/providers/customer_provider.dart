@@ -5,6 +5,7 @@ import '../../data/datasources/customer_remote_data_source.dart';
 import '../../data/repositories/customer_repository_impl.dart';
 import '../../domain/entities/customer.dart';
 import '../../domain/repositories/customer_repository.dart';
+import '../../domain/usecases/get_customer_usecase.dart';
 
 final customerRemoteDataSourceProvider = Provider<CustomerRemoteDataSource>((
   ref,
@@ -20,13 +21,19 @@ final customerRepositoryProvider = Provider<CustomerRepository>((ref) {
   return CustomerRepositoryImpl(remoteDataSource);
 });
 
+final getCustomerUseCaseProvider = Provider<GetCustomerUseCase>((ref) {
+  final repository = ref.watch(customerRepositoryProvider);
+
+  return GetCustomerUseCase(repository);
+});
+
 final customerProvider = FutureProvider.family<Customer, CustomerQuery>((
   ref,
   query,
 ) async {
-  final repository = ref.watch(customerRepositoryProvider);
+  final getCustomerUseCase = ref.watch(getCustomerUseCaseProvider);
 
-  return repository.getCustomer(
+  return getCustomerUseCase(
     identificationDocumentCode: query.identificationDocumentCode,
     identificationNumber: query.identificationNumber,
   );
